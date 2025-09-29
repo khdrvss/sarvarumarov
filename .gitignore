@@ -1,0 +1,11 @@
+# Environment
+.env
+.wrangler/
+
+# Dependencies
+node_modules
+
+# Build artifacts
+dist
+build
+.DS_Store
