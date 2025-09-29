@@ -62,6 +62,53 @@ Expect `{ "ok": true }` and a message in Telegram.
 | CORS blocked | Ensure `ALLOWED_ORIGIN` matches the page origin |
 | No message received | Did you start a chat with bot? Correct chat id? |
 
+---
+
+## Cloudflare Pages Deployment (Functions Based)
+The project now includes Cloudflare Pages Functions under `functions/api/*` so you can deploy without running a custom Node server.
+
+### Structure
+```
+public/               # Static assets (index.html)
+functions/api/contact.js  # POST /api/contact
+functions/api/ping.js     # GET  /api/ping
+functions/api/health.js   # GET  /api/health
+```
+
+### Deploy Steps
+1. Push repository to GitHub.
+2. In Cloudflare Pages: Create project → Connect Git → select repo.
+3. Build settings:
+   - Framework preset: None
+   - Build command: (leave empty)
+   - Build output directory: public
+4. After first deploy go to: Settings → Environment variables → Add:
+   - BOT_TOKEN = your bot token
+   - TELEGRAM_CHAT_ID = your personal chat id
+5. Redeploy (auto-triggered after saving env vars).
+
+### Local Preview (optional)
+If you install Wrangler globally:
+```
+npm install -D wrangler
+npx wrangler pages dev public
+```
+This will emulate the Pages environment and your functions.
+
+### Curl Test (Cloudflare)
+After deploy:
+```
+curl -X POST https://<your-project>.pages.dev/api/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test","phone":"998901112233","contact":"username","message":"Hi"}'
+```
+Expect `{ "ok": true }` and Telegram message (phone auto-normalizes to +998901112233, username becomes @username).
+
+### Notes
+- `.env` is ignored; production secrets live in Cloudflare env vars.
+- `server.js` is no longer required for deployment and can be removed if you rely only on Pages.
+- Client JS posts to `/api/contact` (relative) so it works locally (with Node) or on Pages.
+
 ## 9. Next Ideas
 - Add server-side logging to a file.
 - Store leads into a database (e.g. SQLite / Postgres) before sending.
