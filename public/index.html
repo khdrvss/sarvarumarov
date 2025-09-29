@@ -220,12 +220,7 @@
     const statusEl = document.getElementById('formStatus');
     const submitBtn = document.getElementById('submitBtn');
 
-    function apiBase() {
-      // If page already served from backend (same port) just return '' for relative
-      if (location.port === '3000') return '';
-      // Otherwise fallback to explicit backend URL (adjust if you changed PORT)
-      return 'http://localhost:3000';
-    }
+  // Cloudflare Pages: relative /api works in prod and local wrangler dev.
 
     async function sendRequest(url, payload) {
       const res = await fetch(url, {
@@ -257,10 +252,7 @@
       const formData = new FormData(form);
       const payload = Object.fromEntries(formData.entries());
 
-      const base = apiBase();
-      const endpoints = base === ''
-        ? ['/api/contact']
-        : [ `${base}/api/contact`, 'http://127.0.0.1:3000/api/contact' ];
+  const endpoints = ['/api/contact'];
 
       let success = false;
       for (const ep of endpoints) {
